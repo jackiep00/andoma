@@ -2,6 +2,8 @@
 
 import chess
 import argparse
+import chess.svg
+from IPython.display import SVG, display
 from movegeneration import next_move
 
 
@@ -15,12 +17,16 @@ def start():
     )
 
     if user_side == chess.WHITE:
-        print(render(board))
+        # print(render(board))
+        # chess.svg.board(board, size=300)
+        display(SVG(chess.svg.board(board, size=275)))
         board.push(get_move(board))
 
     while not board.is_game_over():
         board.push(next_move(get_depth(), board, debug=False))
-        print(render(board))
+        # print(render(board))
+        # chess.svg.board(board, size=350)
+        display(SVG(chess.svg.board(board, size=275)))
         board.push(get_move(board))
 
     print(f"\nResult: [w] {board.result()} [b]")
@@ -69,14 +75,17 @@ def get_move(board: chess.Board) -> chess.Move:
     for legal_move in board.legal_moves:
         if move == str(legal_move):
             return legal_move
+            
+    print('Invalid move')
     return get_move(board)
 
 
 def get_depth() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--depth", default=3, help="provide an integer (default: 3)")
-    args = parser.parse_args()
-    return max([1, int(args.depth)])
+    return 3
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("--depth", default=3, help="provide an integer (default: 3)")
+    # args = parser.parse_args()
+    # return max([1, int(args.depth)])
 
 
 if __name__ == "__main__":
