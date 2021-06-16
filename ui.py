@@ -19,14 +19,14 @@ def start():
     if user_side == chess.WHITE:
         # print(render(board))
         # chess.svg.board(board, size=300)
-        display(SVG(chess.svg.board(board, size=275)))
+        display(SVG(chess.svg.board(board, size=275, orientation = user_side)))
         board.push(get_move(board))
 
     while not board.is_game_over():
         board.push(next_move(get_depth(), board, debug=False))
         # print(render(board))
         # chess.svg.board(board, size=350)
-        display(SVG(chess.svg.board(board, size=275)))
+        display(SVG(chess.svg.board(board, size=275, orientation = user_side)))
         board.push(get_move(board))
 
     print(f"\nResult: [w] {board.result()} [b]")
