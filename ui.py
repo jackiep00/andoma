@@ -4,7 +4,7 @@ import chess
 import argparse
 import chess.svg
 from IPython.display import SVG, display
-from movegeneration import next_move
+from hab_movegeneration import next_move
 
 
 def start():
@@ -13,20 +13,24 @@ def start():
     """
     board = chess.Board()
     user_side = (
-        chess.WHITE if input("Start as [w]hite or [b]lack:\n") == "w" else chess.BLACK
+        chess.WHITE if input(
+            "Start as [w]hite or [b]lack:\n") == "w" else chess.BLACK
     )
 
     if user_side == chess.WHITE:
         # print(render(board))
         # chess.svg.board(board, size=300)
-        display(SVG(chess.svg.board(board, size=275, orientation = user_side)))
+        display(SVG(chess.svg.board(board, size=275, orientation=user_side)))
+        constraint = get_constraint(board)
         board.push(get_move(board))
 
     while not board.is_game_over():
-        board.push(next_move(get_depth(), board, debug=False))
+        board.push(next_move(get_depth(), board,
+                   debug=False, piece_constraint=constraint))
         # print(render(board))
         # chess.svg.board(board, size=350)
-        display(SVG(chess.svg.board(board, size=275, orientation = user_side)))
+        display(SVG(chess.svg.board(board, size=275, orientation=user_side)))
+        constraint = get_constraint(board)
         board.push(get_move(board))
 
     print(f"\nResult: [w] {board.result()} [b]")
@@ -75,9 +79,16 @@ def get_move(board: chess.Board) -> chess.Move:
     for legal_move in board.legal_moves:
         if move == str(legal_move):
             return legal_move
-            
+
     print('Invalid move')
     return get_move(board)
+
+
+def get_constraint(board: chess.Board) -> chess.Move:
+    """
+    Try (and keep trying) to get a legal next move from the user.
+    Play the move by mutating the game board.
+    """
 
 
 def get_depth() -> int:
