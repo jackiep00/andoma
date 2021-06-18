@@ -6,12 +6,8 @@ from evaluate import evaluate_board, move_value, check_end_game
 
 debug_info: Dict[str, Any] = {}
 
-# move generation using Hand and Brain constraints, where the engine is Brain
-# All functions need a piece_type passed in
 
-
-def next_move(depth: int, board: chess.Board, piece_constraint: int, debug=True
-              ) -> chess.Move:
+def next_move(depth: int, board: chess.Board, piece_constraint: int, debug=True) -> chess.Move:
     """
     What is the next best move?
     """
@@ -27,9 +23,7 @@ def next_move(depth: int, board: chess.Board, piece_constraint: int, debug=True
     return move
 
 
-def get_ordered_moves(board: chess.Board,
-                      piece_constraint: int,  # piece type
-                      ) -> List[chess.Move]:
+def get_ordered_moves(board: chess.Board) -> List[chess.Move]:
     """
     Get legal moves.
     Attempt to sort moves by best to worst.
@@ -40,16 +34,13 @@ def get_ordered_moves(board: chess.Board,
     def orderer(move):
         return move_value(board, move, end_game)
 
-    filtered_moves = [move for move in board.legal_moves if board.piece_at(
-        move.from_square).piece_type == piece_constraint]
     in_order = sorted(
-        filtered_moves, key=orderer, reverse=(board.turn == chess.WHITE)
+        board.legal_moves, key=orderer, reverse=(board.turn == chess.WHITE)
     )
     return list(in_order)
 
 
-def minimax_root(depth: int, board: chess.Board, piece_constraint: int,  # piece type
-                 ) -> chess.Move:
+def minimax_root(depth: int, board: chess.Board, piece_constraint: int) -> chess.Move:
     # White always wants to maximize (and black to minimize)
     # the board score according to evaluate_board()
     maximize = board.turn == chess.WHITE
@@ -57,7 +48,8 @@ def minimax_root(depth: int, board: chess.Board, piece_constraint: int,  # piece
     if not maximize:
         best_move = float("inf")
 
-    moves = get_ordered_moves(board, piece_constraint)
+    moves = [move for move in
+             get_ordered_moves(board) if board.piece_at(move.from_square).piece_type == piece_constraint]
     best_move_found = moves[0]
 
     for move in moves:
@@ -87,12 +79,8 @@ def minimax(
     alpha: float,
     beta: float,
     is_maximising_player: bool,
-    piece_constraint: int,  # piece type
 ) -> float:
     debug_info["nodes"] += 1
-
-    # piece_constraint follows
-    # filtered_moves = [move for move in list(board.legal_moves) if board.piece_at(move.from_square) == pawn]
 
     if board.is_checkmate():
         # The previous move resulted in checkmate
@@ -107,8 +95,7 @@ def minimax(
 
     if is_maximising_player:
         best_move = -float("inf")
-        moves = get_ordered_moves(board, piece_constraint)
-
+        moves = get_ordered_moves(board)
         for move in moves:
             board.push(move)
             best_move = max(
@@ -123,7 +110,7 @@ def minimax(
         return best_move
     else:
         best_move = float("inf")
-        moves = get_ordered_moves(board, piece_constraint)
+        moves = get_ordered_moves(board)
         for move in moves:
             board.push(move)
             best_move = min(
