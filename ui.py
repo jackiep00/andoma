@@ -8,6 +8,10 @@ from hab_movegeneration import next_move
 from bots.example_bots import bot_choose_piece
 from helpers import piece_to_string
 
+piece_mapping = {
+    'p': 1, 'n': 2, 'b': 3, 'r': 4, 'q': 5, 'k': 6, 'pawn': 1, 'knight': 2, 'bishop': 3, 'rook': 4, 'queen': 5, 'king': 6
+}
+
 
 def start():
     """
@@ -86,6 +90,21 @@ def get_move(board: chess.Board) -> chess.Move:
 
     print('Invalid move')
     return get_move(board)
+
+
+def get_constraint(board: chess.Board) -> chess.Piece:
+    """
+    Try (and keep trying) to get a legal bot constraint from the user.
+    """
+    move = input(
+        f"\nThe constraint for the bot (e.g. {list(board.legal_moves)[0]}):\n")
+
+    for legal_move in board.legal_moves:
+        if move == str(legal_move):
+            return legal_move
+
+    print('Invalid move')
+    return get_constraint(board)
 
 
 def get_depth() -> int:

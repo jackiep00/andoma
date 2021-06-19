@@ -31,7 +31,7 @@ def piece_to_string(piece_int: int) -> str:
 # expecting two piece choosing functions
 
 
-def bot_fight(bot1_choose_piece: Callable, bot2_choose_piece: Callable, depth: int = 3, delay_seconds: float = 0.5, debug: bool = False) -> bool:
+def bot_vs_bot(bot1_choose_piece: Callable, bot2_choose_piece: Callable, depth: int = 3, delay_seconds: float = 0.5, debug: bool = False) -> bool:
     # coin flip for which bot is white
     bot1_is_white = random.random() < 0.5
     if bot1_is_white:
