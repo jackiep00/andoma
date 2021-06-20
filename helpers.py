@@ -10,6 +10,15 @@ from IPython.display import SVG, display
 piece_map = {1: 'Pawn', 2: 'Knight', 3: 'Bishop',
              4: 'Rook', 5: 'Queen', 6: 'King'}
 
+piece_value_map = {
+    None: 0,
+    1: 10,
+    2: 30,
+    3: 30,
+    4: 50,
+    5: 90
+}
+
 
 def get_legal_pieces(board: chess.Board) -> List[chess.Piece]:
     return list(set([board.piece_at(x.from_square).piece_type for x in list(board.legal_moves)]))
@@ -25,10 +34,34 @@ def is_checkmate(board: chess.Board, move: chess.Move) -> bool:
     return board_copy.is_checkmate()
 
 
+def is_checkmate(board: chess.Board, move: chess.Move) -> bool:
+    board_copy = copy.deepcopy(board)
+    board_copy.push(move)
+    return board_copy.is_checkmate()
+
+
+def is_eat(board: chess.Board, move: chess.Move) -> bool:
+    to_square = move.to_square
+    return board.piece_at(to_square) is not None
+
+
+def eat_value(board: chess.Board, move: chess.Move, value_map: Dict[chess.Piece, int] = piece_value_map) -> int:
+    to_square = move.to_square
+    return value_map.get(board.piece_at(to_square), 0)
+
+
+def max_eat_value_move_piece(board: chess.Board) -> chess.Piece:
+    moves = list(board.legal_moves)
+    current_max_value =eat_value(board, moves[0])
+    current_piece = board.piece_at(moves[0].from_square)
+    for move in list(board.legal_moves):
+        if eat_value(board, move) > current_max_value:
+            
+
+
+
 def piece_to_string(piece_int: int) -> str:
     return piece_map[piece_int]
-
-# expecting two piece choosing functions
 
 
 def bot_vs_bot(bot1_choose_piece: Callable, bot2_choose_piece: Callable, depth: int = 3, delay_seconds: float = 0.5, debug: bool = False) -> bool:
