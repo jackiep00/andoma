@@ -5,19 +5,11 @@ import copy
 from typing import Dict, List, Any, Callable
 import random
 from hab_movegeneration import next_move
+from evaluate import piece_value
 from IPython.display import SVG, display
 
 piece_map = {1: 'Pawn', 2: 'Knight', 3: 'Bishop',
              4: 'Rook', 5: 'Queen', 6: 'King'}
-
-piece_value_map = {
-    None: 0,
-    1: 10,
-    2: 30,
-    3: 30,
-    4: 50,
-    5: 90
-}
 
 
 def get_legal_pieces(board: chess.Board) -> List[chess.Piece]:
@@ -34,10 +26,17 @@ def is_checkmate(board: chess.Board, move: chess.Move) -> bool:
     return board_copy.is_checkmate()
 
 
-def is_checkmate(board: chess.Board, move: chess.Move) -> bool:
-    board_copy = copy.deepcopy(board)
-    board_copy.push(move)
-    return board_copy.is_checkmate()
+def get_move_piece(board: chess.Board, move: chess.Move) -> chess.Piece:
+    return board.piece_at(move.from_square)
+
+
+def get_checkmate_piece(board: chess.Board) -> bool:
+    for move in list(board.legal_moves):
+        board_copy = copy.deepcopy(board)
+        board_copy.push(move)
+        if board_copy.is_checkmate():
+            return get_move_piece(board, move).piece_type
+    return None
 
 
 def is_eat(board: chess.Board, move: chess.Move) -> bool:
@@ -45,19 +44,25 @@ def is_eat(board: chess.Board, move: chess.Move) -> bool:
     return board.piece_at(to_square) is not None
 
 
-def eat_value(board: chess.Board, move: chess.Move, value_map: Dict[chess.Piece, int] = piece_value_map) -> int:
+def eat_value(board: chess.Board, move: chess.Move, piece_value_map: Dict[chess.Piece, int] = piece_value) -> int:
     to_square = move.to_square
-    return value_map.get(board.piece_at(to_square), 0)
+    print("Piece at square is {} of type {}".format(board.piece_at(to_square), board.piece_at(to_square).__class__))
+    if board.piece_at(to_square):
+        return piece_value_map.get(board.piece_at(to_square).piece_type)
+    else:
+        return 0
 
 
 def max_eat_value_move_piece(board: chess.Board) -> chess.Piece:
     moves = list(board.legal_moves)
-    current_max_value =eat_value(board, moves[0])
+    current_max_value = eat_value(board, moves[0])
     current_piece = board.piece_at(moves[0].from_square)
     for move in list(board.legal_moves):
-        if eat_value(board, move) > current_max_value:
-            
-
+        value = eat_value(board, move)
+        if value > current_max_value:
+           current_max_value = value
+           current_piece = board.piece_at(move.from_square)
+    return current_piece
 
 
 def piece_to_string(piece_int: int) -> str:
