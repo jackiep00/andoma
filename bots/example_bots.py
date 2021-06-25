@@ -36,8 +36,19 @@ def two_knights_opening(board: chess.Board) -> chess.Piece:
 def count_attackers_and_defenders(board: chess.Board) -> chess.Piece:
     my_color = board.turn
     candidate_moves = []
-    for move in list(board.legal_moves()):
+
+    for move in list(board.legal_moves):
         num_attackers = len(board.attackers(my_color, move.to_square))
         num_defenders = len(board.attackers(not my_color, move.to_square))
         if num_attackers > num_defenders:
-            candidate_moves.push(move)
+            candidate_moves.append(move)
+
+    # if there are no candidate moves just return a piece from a random legal move
+    if not candidate_moves:
+        legal_moves = list(board.legal_moves)
+        random.shuffle(legal_moves)
+        return helpers.get_move_piece(board, legal_moves[0]).piece_type
+
+    random.shuffle(candidate_moves)
+
+    return helpers.get_move_piece(board, candidate_moves[0]).piece_type
